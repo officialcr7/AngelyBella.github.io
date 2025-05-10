@@ -334,9 +334,16 @@
             text-shadow: 0 0 15px rgba(255, 215, 0, 0.8), 0 0 25px rgba(255, 69, 0, 0.5);
         }
 
-        #tokenomics-chart {
+        .tokenomics h3 {
+            color: #FFD700;
+            font-size: 1.2rem;
+            margin: 1.5rem 0 1rem;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+        }
+
+        .chart-container {
             max-width: 300px;
-            margin: 0 auto;
+            margin: 0 auto 2rem;
         }
 
         .tokenomics ul {
@@ -737,7 +744,31 @@
 
     <section class="tokenomics">
         <h2>Tokenomics</h2>
-        <canvas id="tokenomics-chart"></canvas>
+
+        <!-- Pie Chart -->
+        <h3>Pie Chart</h3>
+        <div class="chart-container">
+            <canvas id="pie-chart"></canvas>
+        </div>
+
+        <!-- Bar Chart -->
+        <h3>Bar Chart</h3>
+        <div class="chart-container">
+            <canvas id="bar-chart"></canvas>
+        </div>
+
+        <!-- Horizontal Bar Chart -->
+        <h3>Horizontal Bar Chart</h3>
+        <div class="chart-container">
+            <canvas id="horizontal-bar-chart"></canvas>
+        </div>
+
+        <!-- Line Chart -->
+        <h3>Line Chart</h3>
+        <div class="chart-container">
+            <canvas id="line-chart"></canvas>
+        </div>
+
         <ul>
             <li><strong>Supply:</strong> 1,000,000,000 #AngelyBella</li>
             <li><strong>Burn:</strong> 20% Initial Burn</li>
@@ -786,33 +817,97 @@ It’s more than just a token; it’s a celebration of family, love, and the mag
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const ctx = document.getElementById('tokenomics-chart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
+            // Common data for all charts
+            const chartData = {
+                labels: ['Burn', 'Liquidity', 'Marketing', 'Team', 'Community Rewards'],
+                datasets: [{
+                    data: [20, 50, 15, 10, 5],
+                    backgroundColor: ['#FF4500', '#FFD700', '#1E90FF', '#32CD32', '#FF69B4'],
+                    borderWidth: 1,
+                    borderColor: '#fff',
+                }]
+            };
+
+            // Common tooltip callback
+            const tooltipCallback = {
+                callbacks: { label: (context) => `${context.label}: ${context.raw}%` }
+            };
+
+            // Pie Chart
+            const pieCtx = document.getElementById('pie-chart').getContext('2d');
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: 'white', font: { size: 14 } } },
+                        tooltip: tooltipCallback
+                    }
+                }
+            });
+
+            // Bar Chart
+            const barCtx = document.getElementById('bar-chart').getContext('2d');
+            new Chart(barCtx, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: tooltipCallback
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: 'white' } },
+                        x: { ticks: { color: 'white' } }
+                    }
+                }
+            });
+
+            // Horizontal Bar Chart
+            const horizontalBarCtx = document.getElementById('horizontal-bar-chart').getContext('2d');
+            new Chart(horizontalBarCtx, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: tooltipCallback
+                    },
+                    scales: {
+                        x: { beginAtZero: true, ticks: { color: 'white' } },
+                        y: { ticks: { color: 'white' } }
+                    }
+                }
+            });
+
+            // Line Chart
+            const lineCtx = document.getElementById('line-chart').getContext('2d');
+            new Chart(lineCtx, {
+                type: 'line',
                 data: {
-                    labels: ['Burn', 'Liquidity', 'Marketing', 'Team', 'Community Rewards'],
+                    labels: chartData.labels,
                     datasets: [{
-                        data: [20, 50, 15, 10, 5],
-                        backgroundColor: ['#FF4500', '#FFD700', '#1E90FF', '#32CD32', '#FF69B4'],
-                        borderWidth: 2,
-                        borderColor: '#fff',
+                        data: chartData.datasets[0].data,
+                        borderColor: '#FFD700',
+                        backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                        fill: true,
+                        tension: 0.4,
                     }]
                 },
                 options: {
-                    responsive: true;
+                    responsive: true,
                     plugins: {
-                        legend: { position: 'bottom', labels: { color: 'white', font: { size: 14 } } },
-                        tooltip: {
-                            callbacks: {
-                                label: (context) => {
-                                    const label = context.label || '';
-                                    const value = context.raw || 0;
-                                    return `${label}: ${value}%`;
-                                }
-                            }
-                        }
+                        legend: { display: false },
+                        tooltip: tooltipCallback
                     },
-                    animation: { animateRotate: true, animateScale: true }
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: 'white' } },
+                        x: { ticks: { color: 'white' } }
+                    }
                 }
             });
         });
